@@ -120,7 +120,7 @@ const ChartCard = ({ title, icon: Icon, children, delay, className = "" }) => (
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay, type: "spring" }}
-        className={`relative rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-2xl border border-white/10 p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 ${className}`}
+        className={`relative rounded-3xl bg-gradient-to-br from-slate-900/90 dark:from-slate-900/90 from-white/90 via-slate-800/80 dark:via-slate-800/80 via-slate-100/80 to-slate-900/90 dark:to-slate-900/90 to-white/90 backdrop-blur-2xl border border-white/10 dark:border-white/10 border-slate-200/50 p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 ${className}`}
     >
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-500" />
         <div className="relative z-10">
@@ -129,7 +129,7 @@ const ChartCard = ({ title, icon: Icon, children, delay, className = "" }) => (
                     <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                         <Icon className="w-5 h-5 text-indigo-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-white">{title}</h3>
+                    <h3 className="text-xl font-bold text-white dark:text-white text-slate-900">{title}</h3>
                 </div>
             </div>
             {children}
@@ -234,7 +234,7 @@ const Dashboard = () => {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-2xl border border-white/10 p-8 shadow-2xl"
+                    className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-2xl border border-white/10 dark:border-white/10 border-slate-200/50 p-8 shadow-2xl"
                 >
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.3),transparent_50%)] opacity-50" />
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -251,7 +251,7 @@ const Dashboard = () => {
                                     {getGreeting()}!
                                 </h1>
                             </div>
-                            <p className="text-lg text-white/80 font-medium">
+                            <p className="text-lg text-white/80 dark:text-white/80 text-slate-700/80 font-medium">
                                 Here's your inventory overview at a glance
                             </p>
                             <div className="flex items-center gap-4 mt-4">
