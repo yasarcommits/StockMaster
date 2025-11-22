@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import Layout from '../components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import { Package, Search, Plus, X, Filter, Loader2, MoreVertical, AlertCircle } from 'lucide-react';
+import clsx from 'clsx';
 
 const Products = () => {
+    const { isDark } = useTheme();
     const [products, setProducts] = useState([]);
     const [locations, setLocations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -56,7 +59,7 @@ const Products = () => {
                 locationId: '',
                 reorder_level: 10
             });
-            fetchData(); // Refresh list
+            fetchData();
         } catch (error) {
             console.error("Failed to create product", error);
             alert(error.response?.data?.error || 'Failed to create product');
@@ -89,28 +92,53 @@ const Products = () => {
                 </div>
 
                 {/* Search and Filter */}
-                <div className="flex items-center gap-4 glass-card p-2 rounded-2xl">
+                <div className={clsx(
+                    "flex items-center gap-4 p-2 rounded-2xl",
+                    isDark ? "glass-card" : "bg-white border border-slate-200 shadow-md"
+                )}>
                     <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                        <Search className={clsx(
+                            "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5",
+                            isDark ? "text-slate-500" : "text-slate-400"
+                        )} />
                         <input
                             type="text"
                             placeholder="Search products by name, SKU, or category..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 pl-12 py-3"
+                            className={clsx(
+                                "w-full border-none focus:ring-0 pl-12 py-3",
+                                isDark 
+                                    ? "bg-transparent text-white placeholder-slate-500"
+                                    : "bg-transparent text-slate-900 placeholder-slate-400"
+                            )}
                         />
                     </div>
-                    <div className="h-8 w-px bg-white/10" />
-                    <button className="p-3 hover:bg-white/5 rounded-xl text-slate-400 hover:text-white transition-colors mx-2">
+                    <div className={clsx(
+                        "h-8 w-px",
+                        isDark ? "bg-white/10" : "bg-slate-200"
+                    )} />
+                    <button className={clsx(
+                        "p-3 rounded-xl transition-colors mx-2",
+                        isDark 
+                            ? "hover:bg-white/5 text-slate-400 hover:text-white"
+                            : "hover:bg-slate-100 text-slate-600 hover:text-slate-900"
+                    )}>
                         <Filter className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* Product List */}
-                <div className="glass-card overflow-hidden">
+                <div className={clsx(
+                    "overflow-hidden",
+                    isDark ? "glass-card" : "bg-white rounded-2xl border border-slate-200 shadow-lg"
+                )}>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="bg-slate-950/30 text-slate-400 uppercase text-xs font-semibold tracking-wider">
+                            <thead className={clsx(
+                                "uppercase text-xs font-semibold tracking-wider",
+                                isDark ? "bg-slate-950/30 text-slate-400" : "bg-slate-50 text-slate-700"
+                            )}>
                                 <tr>
                                     <th className="px-6 py-4">Name</th>
                                     <th className="px-6 py-4">SKU</th>
@@ -120,7 +148,10 @@ const Products = () => {
                                     <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className={clsx(
+                                "divide-y",
+                                isDark ? "divide-white/5" : "divide-slate-100"
+                            )}>
                                 {loading ? (
                                     <tr>
                                         <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
@@ -130,42 +161,83 @@ const Products = () => {
                                     </tr>
                                 ) : filteredProducts.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
-                                            <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <Package className="w-8 h-8 text-slate-600" />
+                                        <td colSpan="6" className={clsx(
+                                            "px-6 py-12 text-center",
+                                            isDark ? "text-slate-500" : "text-slate-600"
+                                        )}>
+                                            <div className={clsx(
+                                                "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4",
+                                                isDark ? "bg-slate-800/50" : "bg-slate-100"
+                                            )}>
+                                                <Package className={clsx(
+                                                    "w-8 h-8",
+                                                    isDark ? "text-slate-600" : "text-slate-400"
+                                                )} />
                                             </div>
                                             No products found.
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredProducts.map((product) => (
-                                        <tr key={product.id} className="hover:bg-white/5 transition-colors group">
-                                            <td className="px-6 py-4 font-medium text-white">
+                                        <tr key={product.id} className={clsx(
+                                            "transition-colors group",
+                                            isDark ? "hover:bg-white/5" : "hover:bg-slate-50"
+                                        )}>
+                                            <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 group-hover:border-indigo-500/40 transition-colors">
+                                                    <div className={clsx(
+                                                        "w-10 h-10 rounded-lg flex items-center justify-center border transition-colors",
+                                                        isDark 
+                                                            ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20 group-hover:border-indigo-500/40"
+                                                            : "bg-indigo-100 text-indigo-600 border-indigo-200 group-hover:border-indigo-300"
+                                                    )}>
                                                         <Package className="w-5 h-5" />
                                                     </div>
                                                     <div>
-                                                        <div className="font-semibold">{product.name}</div>
-                                                        {/* Placeholder for stock status if available in future */}
+                                                        <div className={clsx(
+                                                            "font-semibold",
+                                                            isDark ? "text-white" : "text-slate-900"
+                                                        )}>{product.name}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-slate-400 font-mono text-xs">{product.sku}</td>
+                                            <td className={clsx(
+                                                "px-6 py-4 font-mono text-xs",
+                                                isDark ? "text-slate-400" : "text-slate-600"
+                                            )}>{product.sku}</td>
                                             <td className="px-6 py-4">
-                                                <span className="px-2.5 py-1 rounded-full bg-slate-800/50 text-xs border border-slate-700 text-slate-300">
+                                                <span className={clsx(
+                                                    "px-2.5 py-1 rounded-full text-xs border",
+                                                    isDark 
+                                                        ? "bg-slate-800/50 border-slate-700 text-slate-300"
+                                                        : "bg-slate-100 border-slate-200 text-slate-700"
+                                                )}>
                                                     {product.category || 'Uncategorized'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-slate-400 uppercase text-xs font-bold tracking-wider">{product.uom}</td>
-                                            <td className="px-6 py-4 text-slate-400">
+                                            <td className={clsx(
+                                                "px-6 py-4 uppercase text-xs font-bold tracking-wider",
+                                                isDark ? "text-slate-400" : "text-slate-600"
+                                            )}>{product.uom}</td>
+                                            <td className={clsx(
+                                                "px-6 py-4",
+                                                isDark ? "text-slate-400" : "text-slate-600"
+                                            )}>
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-medium">{product.reorder_level}</span>
-                                                    <span className="text-xs text-slate-600">units</span>
+                                                    <span className={clsx(
+                                                        "text-xs",
+                                                        isDark ? "text-slate-600" : "text-slate-400"
+                                                    )}>units</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <button className="p-2 hover:bg-white/10 rounded-lg text-slate-500 hover:text-white transition-colors">
+                                                <button className={clsx(
+                                                    "p-2 rounded-lg transition-colors",
+                                                    isDark 
+                                                        ? "hover:bg-white/10 text-slate-500 hover:text-white"
+                                                        : "hover:bg-slate-100 text-slate-600 hover:text-slate-900"
+                                                )}>
                                                     <MoreVertical className="w-4 h-4" />
                                                 </button>
                                             </td>
@@ -187,17 +259,39 @@ const Products = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsModalOpen(false)}
-                            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+                            className={clsx(
+                                "absolute inset-0 backdrop-blur-sm",
+                                isDark ? "bg-slate-950/80" : "bg-slate-900/30"
+                            )}
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative w-full max-w-lg glass-card overflow-hidden shadow-2xl"
+                            className={clsx(
+                                "relative w-full max-w-lg overflow-hidden shadow-2xl",
+                                isDark ? "glass-card" : "bg-white rounded-2xl border border-slate-200"
+                            )}
                         >
-                            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/5">
-                                <h2 className="text-lg font-bold text-white">Add New Product</h2>
-                                <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                            <div className={clsx(
+                                "px-6 py-4 border-b flex items-center justify-between",
+                                isDark 
+                                    ? "border-white/10 bg-white/5"
+                                    : "border-slate-200 bg-slate-50"
+                            )}>
+                                <h2 className={clsx(
+                                    "text-lg font-bold",
+                                    isDark ? "text-white" : "text-slate-900"
+                                )}>Add New Product</h2>
+                                <button 
+                                    onClick={() => setIsModalOpen(false)} 
+                                    className={clsx(
+                                        "transition-colors",
+                                        isDark 
+                                            ? "text-slate-400 hover:text-white"
+                                            : "text-slate-500 hover:text-slate-900"
+                                    )}
+                                >
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
@@ -205,7 +299,10 @@ const Products = () => {
                             <form onSubmit={handleCreateProduct} className="p-6 space-y-5">
                                 <div className="grid grid-cols-2 gap-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-400">Product Name</label>
+                                        <label className={clsx(
+                                            "text-sm font-medium",
+                                            isDark ? "text-slate-400" : "text-slate-700"
+                                        )}>Product Name</label>
                                         <input
                                             type="text"
                                             required
@@ -216,7 +313,10 @@ const Products = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-400">SKU</label>
+                                        <label className={clsx(
+                                            "text-sm font-medium",
+                                            isDark ? "text-slate-400" : "text-slate-700"
+                                        )}>SKU</label>
                                         <input
                                             type="text"
                                             required
@@ -230,7 +330,10 @@ const Products = () => {
 
                                 <div className="grid grid-cols-2 gap-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-400">Category</label>
+                                        <label className={clsx(
+                                            "text-sm font-medium",
+                                            isDark ? "text-slate-400" : "text-slate-700"
+                                        )}>Category</label>
                                         <input
                                             type="text"
                                             value={newProduct.category}
@@ -240,7 +343,10 @@ const Products = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-400">UOM</label>
+                                        <label className={clsx(
+                                            "text-sm font-medium",
+                                            isDark ? "text-slate-400" : "text-slate-700"
+                                        )}>UOM</label>
                                         <select
                                             value={newProduct.uom}
                                             onChange={(e) => setNewProduct({ ...newProduct, uom: e.target.value })}
@@ -255,7 +361,10 @@ const Products = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-400">Reorder Level</label>
+                                    <label className={clsx(
+                                        "text-sm font-medium",
+                                        isDark ? "text-slate-400" : "text-slate-700"
+                                    )}>Reorder Level</label>
                                     <input
                                         type="number"
                                         value={newProduct.reorder_level}
@@ -264,14 +373,26 @@ const Products = () => {
                                     />
                                 </div>
 
-                                <div className="pt-5 border-t border-white/10 mt-2">
+                                <div className={clsx(
+                                    "pt-5 border-t mt-2",
+                                    isDark ? "border-white/10" : "border-slate-200"
+                                )}>
                                     <div className="flex items-center gap-2 mb-4">
-                                        <AlertCircle className="w-4 h-4 text-indigo-400" />
-                                        <p className="text-xs font-medium text-indigo-300">Optional: Add initial stock</p>
+                                        <AlertCircle className={clsx(
+                                            "w-4 h-4",
+                                            isDark ? "text-indigo-400" : "text-indigo-600"
+                                        )} />
+                                        <p className={clsx(
+                                            "text-xs font-medium",
+                                            isDark ? "text-indigo-300" : "text-indigo-700"
+                                        )}>Optional: Add initial stock</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-5">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-400">Initial Quantity</label>
+                                            <label className={clsx(
+                                                "text-sm font-medium",
+                                                isDark ? "text-slate-400" : "text-slate-700"
+                                            )}>Initial Quantity</label>
                                             <input
                                                 type="number"
                                                 value={newProduct.initialStock}
@@ -281,7 +402,10 @@ const Products = () => {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-400">Location</label>
+                                            <label className={clsx(
+                                                "text-sm font-medium",
+                                                isDark ? "text-slate-400" : "text-slate-700"
+                                            )}>Location</label>
                                             <select
                                                 value={newProduct.locationId}
                                                 onChange={(e) => setNewProduct({ ...newProduct, locationId: e.target.value })}
@@ -302,7 +426,12 @@ const Products = () => {
                                     <button
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
-                                        className="px-4 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors font-medium"
+                                        className={clsx(
+                                            "px-4 py-2 rounded-xl font-medium transition-colors",
+                                            isDark 
+                                                ? "text-slate-400 hover:bg-white/5 hover:text-white"
+                                                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                        )}
                                     >
                                         Cancel
                                     </button>

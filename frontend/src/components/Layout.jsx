@@ -19,28 +19,49 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
-const SidebarItem = ({ icon: Icon, label, path, active }) => (
-    <Link
-        to={path}
-        className={clsx(
-            "relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group overflow-hidden",
-            active
-                ? "bg-indigo-600/20 text-theme-primary shadow-lg shadow-indigo-500/10 border border-indigo-500/30"
-                : "text-theme-secondary hover:bg-theme-secondary/10 hover:text-theme-primary border border-transparent"
-        )}
-    >
-        {active && (
-            <motion.div
-                layoutId="active-glow"
-                className="absolute inset-0 bg-indigo-600/10 blur-xl"
-                transition={{ duration: 0.3 }}
-            />
-        )}
-        <Icon className={clsx("w-5 h-5 relative z-10 transition-colors", active ? "text-indigo-400" : "text-theme-muted group-hover:text-indigo-400")} />
-        <span className="font-medium relative z-10">{label}</span>
-        {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />}
-    </Link>
-);
+const SidebarItem = ({ icon: Icon, label, path, active }) => {
+    const { isDark } = useTheme();
+    
+    return (
+        <Link
+            to={path}
+            className={clsx(
+                "relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group overflow-hidden",
+                active
+                    ? isDark 
+                        ? "bg-indigo-600/20 text-theme-primary shadow-lg shadow-indigo-500/10 border border-indigo-500/30"
+                        : "bg-indigo-100 text-indigo-900 shadow-md border border-indigo-200"
+                    : isDark
+                        ? "text-theme-secondary hover:bg-theme-secondary/10 hover:text-theme-primary border border-transparent"
+                        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-transparent"
+            )}
+        >
+            {active && (
+                <motion.div
+                    layoutId="active-glow"
+                    className={clsx(
+                        "absolute inset-0 blur-xl",
+                        isDark ? "bg-indigo-600/10" : "bg-indigo-200/50"
+                    )}
+                    transition={{ duration: 0.3 }}
+                />
+            )}
+            <Icon className={clsx(
+                "w-5 h-5 relative z-10 transition-colors", 
+                active 
+                    ? (isDark ? "text-indigo-400" : "text-indigo-600")
+                    : (isDark ? "text-theme-muted group-hover:text-indigo-400" : "text-slate-600 group-hover:text-indigo-600")
+            )} />
+            <span className="font-medium relative z-10">{label}</span>
+            {active && (
+                <div className={clsx(
+                    "ml-auto w-1.5 h-1.5 rounded-full",
+                    isDark ? "bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]" : "bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.6)]"
+                )} />
+            )}
+        </Link>
+    );
+};
 
 const Layout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -58,10 +79,18 @@ const Layout = ({ children }) => {
     return (
         <div className="min-h-screen bg-theme-primary text-theme-primary flex selection:bg-indigo-500/30">
             {/* Sidebar - Desktop */}
-            <aside className="hidden md:flex flex-col w-72 theme-sidebar fixed h-full z-20">
+            <aside className={clsx(
+                "hidden md:flex flex-col w-72 theme-sidebar fixed h-full z-20",
+                !isDark && "shadow-xl"
+            )}>
                 <div className="p-8">
                     <div className="flex items-center gap-4">
-                        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group overflow-hidden">
+                        <div className={clsx(
+                            "relative w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group overflow-hidden",
+                            isDark 
+                                ? "bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/20"
+                                : "bg-gradient-to-br from-indigo-600 to-purple-700 shadow-indigo-600/30"
+                        )}>
                             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                             <Package className="w-6 h-6 text-white relative z-10" />
                         </div>
@@ -69,17 +98,28 @@ const Layout = ({ children }) => {
                             <h1 className="text-xl font-bold text-theme-primary tracking-tight">
                                 StockMaster
                             </h1>
-                            <p className="text-xs text-theme-muted font-medium">Inventory System</p>
+                            <p className={clsx(
+                                "text-xs font-medium",
+                                isDark ? "text-theme-muted" : "text-slate-500"
+                            )}>Inventory System</p>
                         </div>
                     </div>
                 </div>
 
                 <nav className="flex-1 px-6 space-y-2 mt-2">
                     <div className="flex items-center justify-between px-4 mb-4">
-                        <p className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Menu</p>
+                        <p className={clsx(
+                            "text-xs font-semibold uppercase tracking-wider",
+                            isDark ? "text-theme-muted" : "text-slate-500"
+                        )}>Menu</p>
                         <button
                             onClick={toggleTheme}
-                            className="p-1.5 rounded-lg bg-theme-secondary/20 border border-theme-primary/20 hover:bg-theme-secondary/30 transition-all text-theme-secondary hover:text-indigo-400"
+                            className={clsx(
+                                "p-1.5 rounded-lg border transition-all",
+                                isDark 
+                                    ? "bg-theme-secondary/20 border-theme-primary/20 hover:bg-theme-secondary/30 text-theme-secondary hover:text-indigo-400"
+                                    : "bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-600 hover:text-indigo-600"
+                            )}
                             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                         >
                             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -94,21 +134,42 @@ const Layout = ({ children }) => {
                     ))}
                 </nav>
 
-                <div className="p-6 border-t border-theme-primary/20">
-                    <Link to="/profile" className="flex items-center gap-4 px-4 py-3 rounded-2xl bg-theme-secondary/20 border border-theme-primary/20 hover:bg-theme-secondary/30 transition-all group cursor-pointer">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20 group-hover:border-indigo-500/40 transition-colors">
+                <div className={clsx(
+                    "p-6 border-t",
+                    isDark ? "border-theme-primary/20" : "border-slate-200"
+                )}>
+                    <Link to="/profile" className={clsx(
+                        "flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all group cursor-pointer",
+                        isDark 
+                            ? "bg-theme-secondary/20 border-theme-primary/20 hover:bg-theme-secondary/30"
+                            : "bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300 shadow-sm hover:shadow"
+                    )}>
+                        <div className={clsx(
+                            "w-10 h-10 rounded-full flex items-center justify-center border transition-colors",
+                            isDark 
+                                ? "bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 border-indigo-500/20 group-hover:border-indigo-500/40"
+                                : "bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-600 border-indigo-200 group-hover:border-indigo-300"
+                        )}>
                             <User className="w-5 h-5" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold truncate text-theme-primary transition-colors">{user?.name || 'User'}</p>
-                            <p className="text-xs text-theme-secondary truncate transition-colors">{user?.email}</p>
+                            <p className={clsx(
+                                "text-xs truncate transition-colors",
+                                isDark ? "text-theme-secondary" : "text-slate-600"
+                            )}>{user?.email}</p>
                         </div>
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
                                 logout();
                             }}
-                            className="p-2 hover:bg-red-500/10 rounded-lg text-theme-muted hover:text-red-400 transition-colors"
+                            className={clsx(
+                                "p-2 rounded-lg transition-colors",
+                                isDark 
+                                    ? "hover:bg-red-500/10 text-theme-muted hover:text-red-400"
+                                    : "hover:bg-red-50 text-slate-500 hover:text-red-600"
+                            )}
                             title="Logout"
                         >
                             <LogOut className="w-4 h-4" />
@@ -118,9 +179,19 @@ const Layout = ({ children }) => {
             </aside>
 
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-theme-primary/80 backdrop-blur-xl border-b border-theme-primary/20 px-4 py-3 flex items-center justify-between">
+            <div className={clsx(
+                "md:hidden fixed top-0 left-0 right-0 z-30 backdrop-blur-xl border-b px-4 py-3 flex items-center justify-between",
+                isDark 
+                    ? "bg-theme-primary/80 border-theme-primary/20"
+                    : "bg-white/95 border-slate-200 shadow-sm"
+            )}>
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <div className={clsx(
+                        "w-8 h-8 rounded-lg flex items-center justify-center",
+                        isDark 
+                            ? "bg-gradient-to-br from-indigo-500 to-purple-600"
+                            : "bg-gradient-to-br from-indigo-600 to-purple-700"
+                    )}>
                         <Package className="w-5 h-5 text-white" />
                     </div>
                     <span className="font-bold text-lg text-theme-primary">StockMaster</span>
@@ -128,12 +199,25 @@ const Layout = ({ children }) => {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={toggleTheme}
-                        className="p-2 text-theme-secondary hover:text-theme-primary"
+                        className={clsx(
+                            "p-2 transition-colors",
+                            isDark 
+                                ? "text-theme-secondary hover:text-theme-primary"
+                                : "text-slate-600 hover:text-slate-900"
+                        )}
                         title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                     >
                         {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </button>
-                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-theme-secondary hover:text-theme-primary">
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                        className={clsx(
+                            "p-2 transition-colors",
+                            isDark 
+                                ? "text-theme-secondary hover:text-theme-primary"
+                                : "text-slate-600 hover:text-slate-900"
+                        )}
+                    >
                         {isMobileMenuOpen ? <X /> : <Menu />}
                     </button>
                 </div>
@@ -157,8 +241,12 @@ const Layout = ({ children }) => {
                                     className={clsx(
                                         "flex items-center gap-3 px-4 py-4 rounded-xl border transition-all",
                                         location.pathname === item.path
-                                            ? "bg-indigo-600/20 text-theme-primary border-indigo-500/30"
-                                            : "bg-theme-secondary/10 text-theme-secondary border-transparent"
+                                            ? isDark 
+                                                ? "bg-indigo-600/20 text-theme-primary border-indigo-500/30"
+                                                : "bg-indigo-100 text-indigo-900 border-indigo-200"
+                                            : isDark
+                                                ? "bg-theme-secondary/10 text-theme-secondary border-transparent"
+                                                : "bg-slate-50 text-slate-700 border-slate-200"
                                     )}
                                 >
                                     <item.icon className="w-5 h-5" />
@@ -170,7 +258,12 @@ const Layout = ({ children }) => {
                             <Link
                                 to="/profile"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-3 px-4 py-4 rounded-xl border border-transparent bg-theme-secondary/10 text-theme-secondary mt-4"
+                                className={clsx(
+                                    "flex items-center gap-3 px-4 py-4 rounded-xl border mt-4",
+                                    isDark 
+                                        ? "border-transparent bg-theme-secondary/10 text-theme-secondary"
+                                        : "bg-slate-50 text-slate-700 border-slate-200"
+                                )}
                             >
                                 <User className="w-5 h-5" />
                                 <span className="font-medium">My Profile</span>
@@ -180,7 +273,12 @@ const Layout = ({ children }) => {
 
                         <button
                             onClick={logout}
-                            className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 mt-auto"
+                            className={clsx(
+                                "w-full flex items-center justify-center gap-3 px-4 py-4 rounded-xl border mt-auto",
+                                isDark 
+                                    ? "bg-red-500/10 text-red-400 border-red-500/20"
+                                    : "bg-red-50 text-red-600 border-red-200"
+                            )}
                         >
                             <LogOut className="w-5 h-5" />
                             <span className="font-medium">Sign Out</span>
